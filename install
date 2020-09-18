@@ -1,0 +1,61 @@
+#!/bin/bash
+IFS=$'\n\t'
+
+#Colors
+	R='\033[1;31m'
+        G='\033[1;32m'
+        Y='\033[1;33m'
+        B='\033[1;34m'
+        M='\033[1;35m'
+        C='\033[1;36m'
+        W='\033[0m'
+
+
+function Termux {
+	if [ ! -d $HOME/.config ]; then
+		mkdir -p $HOME/.config
+	fi
+	if [ -d ~/.config/youtube-dl ]; then
+		rm -rf ~/.config/youtube-dl
+	fi
+	git clone https://github.com/ivam3/youtube-dl.git $HOME/.config/youtube-dl
+	dpkg --configure -a
+	apt update && apt -y upgrade
+		if [ -d $PREFIX/lib/python3.7/site-packages/youtube_dl ]; then
+			yes | pip uninstall youtube_dl
+		fi
+	sleep 1
+	apt install -y util-linux wget curl python python-dev python2
+	yes | pip install youtube-dl
+	mkdir -p ~/.config/youtube-dl/downloads
+	touch ~/.config/youtube-dl/config
+	mkdir ~/.config/youtube-dl/bin
+	ln -s ~/.config/youtube-dl/bin ~/bin
+	cp ~/.config/youtube-dl/.data/.netrc ~/.config/youtube-dl/
+	chmod 777 ~/.config/youtube-dl/.netrc
+	mv ~/.config/youtube-dl/.data/LhDxGbtY ~/.config/youtube-dl/bin/termux-url-opener
+	dos2unix ~/.config/youtube-dl/bin/termux-url-opener
+	rm -rf ~/.config/youtube-dl/.data
+}
+function Andrax {
+        if [ -d $PREFIX/lib/python3.7/site-packages/youtube_dl ]; then
+                yes | python3 -m pip uninstall youtube_dl
+	fi
+        sleep 1
+        yes | python3 -m pip install youtube-dl
+        if [ ! -d ~/youtube-dl ]; then
+		rm -rf ~/youtube-dl
+	fi
+}
+	
+
+Banner
+DISTRO=$(echo $HOME | grep -oE '([tadermunx]{6,6})')
+if [ $DISTRO=termux ]; then Termux
+elif [ $DISTRO=andrax ]; then Andrax
+else
+	echo $(clear)
+	printf "$R O.ops unknown distro \n\n"
+	thanks
+fi
+
